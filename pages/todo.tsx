@@ -8,13 +8,31 @@ const inter = Inter({ subsets: ["latin"] });
 
 export default function Todo() {
   const [todos, setTodos] = useState<any[]>([]);
+  const [title, setTitle] = useState("");
 
   useEffect(() => {
     fetchTodos();
   }, []);
 
+  const titleChange = (e) => {
+    setTitle(e.target.value);
+  };
+
+  const submitForm = (e) => {
+    e.preventDefault();
+    var formData = new FormData();
+    formData.append("title", title);
+    formData.append("is_done", 0);
+
+    axios.post("api/todos", formData).then(() => {
+      setTitle('');
+      fetchTodos();
+    });
+   
+  };
+
   function fetchTodos() {
-    axios.get("/api/todos").then((response) => {
+    axios.get("api/todos").then((response) => {
       setTodos(response.data);
     });
   }
@@ -32,12 +50,15 @@ export default function Todo() {
           <div className="row justify-content-center">
             <div className="col-sm-7">
               <h1 className="text-center mb-3">Todo App</h1>
-              <form action="">
+              <form method="POST" onSubmit={submitForm}>
                 <div className="mb-3">
                   <input
-                    type="title"
+                    type="text"
                     className="form-control"
                     placeholder="Type..."
+                    onChange={titleChange}
+                    value={title}
+                    name="title"
                   />
                 </div>
                 <div className="text-end">
@@ -62,8 +83,13 @@ export default function Todo() {
                         <td>{i + 1}</td>
                         <td>{item.title}</td>
                         <td>
-                          <button className="btn btn-primary btn-sm">Edit</button>
-                          &nbsp;<button className="btn btn-danger btn-sm">Delete</button>
+                          <button className="btn btn-primary btn-sm">
+                            Edit
+                          </button>
+                          &nbsp;
+                          <button className="btn btn-danger btn-sm">
+                            Delete
+                          </button>
                         </td>
                       </tr>
                     ))}
