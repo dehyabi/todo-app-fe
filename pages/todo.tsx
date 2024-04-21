@@ -31,7 +31,7 @@ export default function Todo() {
       formData.append("_method", "PUT");
     }
 
-    axios.post(url, formData).then(() => {
+    axios.post(url, formData).then((response) => {
       setTitle("");
       fetchTodos();
       setTodoId("");
@@ -50,6 +50,16 @@ export default function Todo() {
   function fetchTodos() {
     axios.get("api/todos").then((response) => {
       setTodos(response.data);
+    });
+  }
+
+  function deleteTodo(id) {
+    let params = { "_method": "delete" };
+
+    axios.post("api/todos/" + id, params).then((response) => {
+      setTitle("");
+      fetchTodos();
+      setTodoId("");
     });
   }
 
@@ -106,7 +116,10 @@ export default function Todo() {
                             Edit
                           </button>
                           &nbsp;
-                          <button className="btn btn-danger btn-sm">
+                          <button
+                            className="btn btn-danger btn-sm"
+                            onClick={() => deleteTodo(item.id)}
+                          >
                             Delete
                           </button>
                         </td>
