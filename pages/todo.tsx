@@ -9,6 +9,7 @@ const inter = Inter({ subsets: ["latin"] });
 export default function Todo() {
   const [todos, setTodos] = useState<any[]>([]);
   const [title, setTitle] = useState("");
+  const [todoid, setTodoId] = useState("");
 
   useEffect(() => {
     fetchTodos();
@@ -20,16 +21,31 @@ export default function Todo() {
 
   const submitForm = (e) => {
     e.preventDefault();
-    var formData = new FormData();
+    let formData = new FormData();
     formData.append("title", title);
     formData.append("is_done", 0);
+    let url = "api/todos";
 
-    axios.post("api/todos", formData).then(() => {
-      setTitle('');
+    if (todoid != "") {
+      url = "api/todos/" + todoid;
+      formData.append("_method", "PUT");
+    }
+
+    axios.post(url, formData).then(() => {
+      setTitle("");
       fetchTodos();
+      setTodoId("");
     });
-   
   };
+
+  function editTodo(id) {
+    setTodoId(id);
+    todos.map((item) => {
+      if (item.id == id) {
+        setTitle(item.title);
+      }
+    });
+  }
 
   function fetchTodos() {
     axios.get("api/todos").then((response) => {
@@ -83,7 +99,10 @@ export default function Todo() {
                         <td>{i + 1}</td>
                         <td>{item.title}</td>
                         <td>
-                          <button className="btn btn-primary btn-sm">
+                          <button
+                            className="btn btn-primary btn-sm"
+                            onClick={() => editTodo(item.id)}
+                          >
                             Edit
                           </button>
                           &nbsp;
