@@ -2,7 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   env: {
-    BACKEND_URL:'http://localhost:8000'
+    BACKEND_URL: process.env.NEXT_PUBLIC_BACKEND_URL,
   }
 };
 
