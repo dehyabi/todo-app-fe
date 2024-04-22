@@ -54,9 +54,18 @@ export default function Todo() {
   }
 
   function deleteTodo(id) {
-    let params = { "_method": "delete" };
+    let params = { _method: "delete" };
 
     axios.post("api/todos/" + id, params).then((response) => {
+      setTitle("");
+      fetchTodos();
+      setTodoId("");
+    });
+  }
+
+  function isDoneTodo(id, is_done) {
+    let params = { is_done: !is_done };
+    axios.post("api/todos/done/" + id, params).then((response) => {
       setTitle("");
       fetchTodos();
       setTodoId("");
@@ -97,6 +106,7 @@ export default function Todo() {
               <table className="table table-border mt-4">
                 <thead>
                   <tr>
+                    <th></th>
                     <th>No.</th>
                     <th>Title</th>
                     <th>Action</th>
@@ -105,7 +115,15 @@ export default function Todo() {
                 <tbody>
                   {todos &&
                     todos.map((item, i) => (
-                      <tr key={i}>
+                      <tr key={i} className={item.is_done ? 'text-decoration-line-through': ''}>
+                        <td>
+                          <input
+                            type="checkbox"
+                            className="form-check-input"
+                            checked={item.is_done}
+                            onChange={() => isDoneTodo(item.id, item.is_done)}
+                          />
+                        </td>
                         <td>{i + 1}</td>
                         <td>{item.title}</td>
                         <td>
