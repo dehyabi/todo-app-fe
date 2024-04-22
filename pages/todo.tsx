@@ -2,18 +2,19 @@ import Head from "next/head";
 import { Inter } from "next/font/google";
 import styles from "@/styles/Home.module.css";
 import axios from "@/lib/axios";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useRouter } from "next/router";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export default function Todo() {
-  const [todos, setTodos] = useState<any[]>([]);
+function Todo({ todos }) {
+  const router = useRouter();
   const [title, setTitle] = useState("");
   const [todoid, setTodoId] = useState("");
 
-  useEffect(() => {
-    fetchTodos();
-  }, []);
+  const fetchTodos = () => {
+    router.replace(router.asPath);
+  };
 
   const titleChange = (e) => {
     setTitle(e.target.value);
@@ -44,12 +45,6 @@ export default function Todo() {
       if (item.id == id) {
         setTitle(item.title);
       }
-    });
-  }
-
-  function fetchTodos() {
-    axios.get("api/todos").then((response) => {
-      setTodos(response.data);
     });
   }
 
@@ -115,7 +110,12 @@ export default function Todo() {
                 <tbody>
                   {todos &&
                     todos.map((item, i) => (
-                      <tr key={i} className={item.is_done ? 'text-decoration-line-through': ''}>
+                      <tr
+                        key={i}
+                        className={
+                          item.is_done ? "text-decoration-line-through" : ""
+                        }
+                      >
                         <td>
                           <input
                             type="checkbox"
@@ -152,3 +152,12 @@ export default function Todo() {
     </>
   );
 }
+
+export async function getServerSideProps(context) {
+  const res = await fetch(process.env.BACKEND_URL + "/api/todos");
+  const todos = await res.json();
+
+  return { props: { todos } };
+}
+
+export default Todo;
